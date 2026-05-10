@@ -21,19 +21,17 @@ function Get-VersionNumber($Json) {
 
 try {
     $RemoteVersion = Get-VersionNumber (Invoke-WebRequest $RepoVersionUrl -UseBasicParsing -ErrorAction Stop).Content
-    $LocalVersion  = if (Test-Path $LocalVersionFile) {Get-VersionNumber (Get-Content $LocalVersionFile -Raw)} else {"0.0"}
+    $LocalVersion = if (Test-Path $LocalVersionFile) { Get-VersionNumber (Get-Content $LocalVersionFile -Raw) } else { "0.0" }
     if ([version]$RemoteVersion -gt [version]$LocalVersion) {
         $NotifyIcon.BalloonTipTitle = "Spicetify Updater"
-        $NotifyIcon.BalloonTipText = "Updater is Outdated. ($LocalVersion -> $RemoteVersion), Updating"
+        $NotifyIcon.BalloonTipText = "Updater is Outdated ($LocalVersion -> $RemoteVersion), Updating"
         $NotifyIcon.ShowBalloonTip(3000)
-        Start-Sleep -Seconds 1
         
         $TempZip = "$env:TEMP\SU_Update.zip"
         $TempDir = "$env:TEMP\SU_Update"
         Invoke-WebRequest $RepoZip -UseBasicParsing -OutFile $TempZip -ErrorAction Stop
         if (Test-Path $TempDir) { Remove-Item $TempDir -Recurse -Force }
         Expand-Archive $TempZip -DestinationPath $TempDir -Force
-        
         $ExtractedDir = Get-ChildItem $TempDir -Directory | Select-Object -First 1
         if ($ExtractedDir) {
             Get-ChildItem $ExtractedDir.FullName -File | ForEach-Object {
@@ -43,11 +41,6 @@ try {
         
         Remove-Item $TempZip -Force -ErrorAction SilentlyContinue
         Remove-Item $TempDir -Recurse -Force -ErrorAction SilentlyContinue
-        $NotifyIcon.Dispose()
-        
-        $ScriptPath = "$PSScriptRoot\Spicetify Updater.bat"
-        Start-Process cmd -ArgumentList "/c start /b `"$ScriptPath`"" -WindowStyle Hidden
-        exit
     }
 } catch {}
 
