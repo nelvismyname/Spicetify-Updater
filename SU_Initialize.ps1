@@ -24,7 +24,7 @@ try {
     $LocalVersion  = if (Test-Path $LocalVersionFile) {Get-VersionNumber (Get-Content $LocalVersionFile -Raw)} else {"0.0"}
     if ([version]$RemoteVersion -gt [version]$LocalVersion) {
         $NotifyIcon.BalloonTipTitle = "Spicetify Updater"
-        $NotifyIcon.BalloonTipText  = "Updater is Outdated. ($LocalVersion -> $RemoteVersion), Updating"
+        $NotifyIcon.BalloonTipText = "Updater is Outdated. ($LocalVersion -> $RemoteVersion), Updating"
         $NotifyIcon.ShowBalloonTip(3000)
         Start-Sleep -Seconds 1
         
